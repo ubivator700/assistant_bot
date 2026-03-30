@@ -350,11 +350,12 @@ async def _handle_query(message: Message, text: str, user_id: int) -> None:
     tasks = await db_service.get_tasks(user_id, status="pending")
     meetings = await db_service.get_meetings(user_id, since=now)
 
+    prio_label = {1: "высокий", 2: "средний", 3: "низкий"}
     data_context = (
         f"Расходы за месяц ({len(expenses)} шт., итого {sum(float(e.amount) for e in expenses):.2f} EUR):\n"
         + "\n".join(f"  {float(e.amount):.2f} {e.currency} — {e.category} — {e.description}" for e in expenses[:10])
         + f"\n\nЗадачи в работе ({len(tasks)} шт.):\n"
-        + "\n".join(f"  [{{1:'высокий',2:'средний',3:'низкий'}.get(t.priority,'?')}] {t.title}" for t in tasks[:10])
+        + "\n".join(f"  [{prio_label.get(t.priority, '?')}] {t.title}" for t in tasks[:10])
         + f"\n\nБудущие встречи ({len(meetings)} шт.):\n"
         + "\n".join(f"  {m.start_dt.strftime('%d.%m.%Y %H:%M')} — {m.title}" for m in meetings[:10])
     )
